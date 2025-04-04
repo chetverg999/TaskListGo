@@ -59,3 +59,10 @@ func (repository *TaskRepository) Delete(id int) error {
 func (repository *TaskRepository) Get() (pgx.Rows, error) {
 	return repository.db.Query(context.Background(), `SELECT * FROM tasks`)
 }
+
+func (repository *TaskRepository) Count(id int) int {
+	var count int
+	_ = repository.db.QueryRow(context.Background(), `SELECT COUNT(*) FROM tasks WHERE id=$1`, id).Scan(&count)
+
+	return count
+}

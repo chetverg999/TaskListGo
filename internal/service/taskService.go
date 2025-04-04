@@ -17,12 +17,14 @@ type TaskService struct {
 }
 
 func NewTaskService(ctx context.Context) *TaskService {
-	return &TaskService{ctx: ctx, validator: &validator.TaskValidator{}, repository: repository.NewTaskRepository(ctx)}
+	repository := repository.NewTaskRepository(ctx)
+
+	return &TaskService{ctx: ctx, validator: validator.NewTaskValidator(repository), repository: repository}
 }
 
 func (t *TaskService) Create(c *fiber.Ctx, task *model.Task) error {
-	if err := t.validateRequest(c, task); err != nil {
-		return err
+	if err := t.validateRequest(task); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(err)
 	}
 
 	task.UpdatedAt = time.Now()
@@ -32,29 +34,38 @@ func (t *TaskService) Create(c *fiber.Ctx, task *model.Task) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Ошибка при создании задачи"})
 	}
 
-	return nil
+	return c.Status(http.StatusCreated).JSON(task)
 }
 
 func (t *TaskService) Update(c *fiber.Ctx, task *model.Task, id int) error {
-	if err := t.validateRequest(c, task); err != nil {
-		return err
+	if err := t.validateRequest(task); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(err)
 	}
 
+	if err := t.validator.IssetValidate(id); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(err)
+	}
+
+	task.ID = id
 	task.UpdatedAt = time.Now()
 
-	if err := t.repository.Update(task, id); err != nil {
+	if err := t.repository.Update(task, task.ID); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Ошибка обновления задачи"})
 	}
 
-	return nil
+	return c.Status(http.StatusOK).JSON(task)
 }
 
 func (t *TaskService) Delete(c *fiber.Ctx, id int) error {
+	if err := t.validator.IssetValidate(id); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(err)
+	}
+
 	if err := t.repository.Delete(id); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Ошибка удаления задачи"})
 	}
 
-	return nil
+	return c.Status(http.StatusNoContent).JSON(id)
 }
 
 func (t *TaskService) Get(c *fiber.Ctx) ([]model.Task, error) {
@@ -81,9 +92,9 @@ func (t *TaskService) Get(c *fiber.Ctx) ([]model.Task, error) {
 	return tasks, nil
 }
 
-func (t *TaskService) validateRequest(c *fiber.Ctx, task *model.Task) error {
+func (t *TaskService) validateRequest(task *model.Task) fiber.Map {
 	if err := t.validator.Validate(*task); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Ошибка валидации данных", "details": err.Error()})
+		return fiber.Map{"error": "Ошибка валидации данных", "details": err.Error()}
 	}
 
 	return nil

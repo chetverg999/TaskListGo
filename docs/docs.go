@@ -129,8 +129,14 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Task deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
                         "schema": {
                             "type": "string"
                         }

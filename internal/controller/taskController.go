@@ -33,11 +33,7 @@ func (t *TaskController) Create(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Неверные данные"})
 	}
 
-	if err := t.taskService.Create(c, task); err != nil {
-		return err
-	}
-
-	return c.Status(http.StatusCreated).JSON(task)
+	return t.taskService.Create(c, task)
 }
 
 // GetList godoc
@@ -73,26 +69,19 @@ func (t *TaskController) Update(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Неверные данные"})
 	}
 
-	if err := t.taskService.Update(c, task, id); err != nil {
-		return err
-	}
-
-	return c.JSON(fiber.Map{"message": "Задача обновлена"})
+	return t.taskService.Update(c, task, id)
 }
 
 // Delete godoc
 // @Summary Delete a task
 // @Description Delete a task by ID
 // @Param id path int true "Task ID"
-// @Success 200 {object} string "Task deleted successfully"
+// @Success 204 {object} string "Task deleted successfully"
+// @Failure 400 {object} string "Invalid request"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tasks/{id} [delete]
 func (t *TaskController) Delete(c *fiber.Ctx) error {
 	id, _ := strconv.Atoi(c.Params("id"))
 
-	if err := t.taskService.Delete(c, id); err != nil {
-		return err
-	}
-
-	return c.JSON(fiber.Map{"message": "Задача удалена"})
+	return t.taskService.Delete(c, id)
 }
