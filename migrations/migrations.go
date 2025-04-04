@@ -5,42 +5,52 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2/log"
 	pgxpool "github.com/jackc/pgx/v5/pgxpool"
-	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testTask/internal/database"
 )
 
-func MigrateDatabase(conn *pgxpool.Pool, migrationDir string) {
-	files, err := ioutil.ReadDir(migrationDir)
+type Migration struct {
+	psql *database.Psql
+}
+
+func NewMigration(psql *database.Psql) *Migration {
+	return &Migration{psql: psql}
+}
+
+func (m *Migration) MigrateDatabase(migrationDir string) {
+	files, err := os.ReadDir(migrationDir)
+
 	if err != nil {
 		log.Fatalf("Ошибка при чтении директории миграций: %v\n", err)
 	}
 
 	for _, file := range files {
-		if file.IsDir() || !IsSQLFile(file.Name()) {
+		if file.IsDir() || !m.isSQLFile(file.Name()) {
 			continue
 		}
+
 		filePath := fmt.Sprintf("%s/%s", migrationDir, file.Name())
-		fmt.Printf("Применяется миграция: %s\n", filePath)
-		err := ApplyMigration(conn, filePath)
-		if err != nil {
+
+		if err = m.applyMigration(m.psql.Db(), filePath); err != nil {
 			log.Fatalf("Ошибка при применении миграции %s: %v\n", filePath, err)
 		}
 	}
-	fmt.Println("Миграции применены успешно!")
 }
 
-func IsSQLFile(fileName string) bool {
+func (m *Migration) isSQLFile(fileName string) bool {
 
-	return len(fileName) > 4 && fileName[len(fileName)-4:] == ".sql"
+	return filepath.Ext(fileName) == ".sql"
 }
 
-func ApplyMigration(conn *pgxpool.Pool, filePath string) error {
-	sqlBytes, err := ioutil.ReadFile(filePath)
+func (m *Migration) applyMigration(conn *pgxpool.Pool, filePath string) error {
+	sqlBytes, err := os.ReadFile(filePath)
+
 	if err != nil {
 		return fmt.Errorf("не удалось прочитать файл миграции %s: %v", filePath, err)
 	}
-	sql := string(sqlBytes)
-	_, err = conn.Exec(context.Background(), sql)
-	if err != nil {
+
+	if _, err = conn.Exec(context.Background(), string(sqlBytes)); err != nil {
 		return fmt.Errorf("не удалось выполнить миграцию %s: %v", filePath, err)
 	}
 

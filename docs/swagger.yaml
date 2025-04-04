@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  models.Task:
+  model.Task:
     properties:
       created_at:
         type: string
@@ -36,7 +36,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Task'
+              $ref: '#/definitions/model.Task'
             type: array
         "500":
           description: Internal server error
@@ -51,12 +51,12 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/models.Task'
+          $ref: '#/definitions/model.Task'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Task'
+            $ref: '#/definitions/model.Task'
         "400":
           description: Invalid request
           schema:
@@ -98,7 +98,7 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/models.Task'
+          $ref: '#/definitions/model.Task'
       responses:
         "200":
           description: Task updated successfully

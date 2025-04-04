@@ -1,11 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/swagger"
+	"github.com/joho/godotenv"
+	"os"
+	"testTask/internal/controller"
 	"testTask/internal/database"
-	"testTask/internal/handlers"
+	"testTask/internal/helper"
+	"testTask/migrations"
 )
 
 // @title           API TaskList
@@ -13,20 +19,32 @@ import (
 // @description     API для работы с задачами
 // @BasePath        /api
 func main() {
-	database.ConnectDB()
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Ошибка загрузки .env файла")
+	}
+
+	psql := database.NewPsql()
+
+	defer psql.Db().Close()
+
+	migrations.NewMigration(psql).MigrateDatabase(os.Getenv("MIGRATION_DIR"))
+
 	app := fiber.New()
+
+	taskController := controller.NewTaskController(context.WithValue(context.Background(), helper.PsqlKey, psql))
+
 	app.Get("/swagger/*", swagger.HandlerDefault)
 	app.Get("/swagger/doc.json", func(c *fiber.Ctx) error {
 		return c.SendFile("./docs/swagger.json")
 	})
-	app.Post("/tasks", handlers.CreateTask)
-	app.Get("/tasks", handlers.GetTasks)
-	app.Put("/tasks/:id", handlers.UpdateTask)
-	app.Delete("/tasks/:id", handlers.DeleteTask)
-	fmt.Println("Сервер запущен на http://localhost:3000")
-	err := app.Listen(":3000")
+	app.Post("/tasks", taskController.Create)
+	app.Get("/tasks", taskController.GetList)
+	app.Put("/tasks/:id", taskController.Update)
+	app.Delete("/tasks/:id", taskController.Delete)
 
-	if err != nil {
+	if err = app.Listen(fmt.Sprintf(":%s", os.Getenv("PORT"))); err != nil {
 		panic(err)
 	}
 }

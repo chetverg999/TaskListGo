@@ -4,35 +4,43 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"testTask/migrations"
+	"sync"
 )
 
-var DB *pgxpool.Pool
+type Psql struct {
+	db *pgxpool.Pool
+}
 
-func ConnectDB() {
-	err := godotenv.Load("config/.env")
+var (
+	instance *Psql
+	once     sync.Once
+)
 
-	if err != nil {
-		log.Fatal("Ошибка загрузки .env файла")
-	}
+func (p *Psql) Db() *pgxpool.Pool {
+	return p.db
+}
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
+func NewPsql() *Psql {
+	once.Do(func() {
+		dsn := fmt.Sprintf(
+			"postgres://%s:%s@%s:%s/%s",
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_PASSWORD"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+		)
 
-	dbpool, err := pgxpool.New(context.Background(), dsn)
-	if err != nil {
-		log.Fatalf("Ошибка подключения к БД: %v", err)
-	}
-	migrationDir := "./migrations"
-	migrations.MigrateDatabase(dbpool, migrationDir)
-	DB = dbpool
-	fmt.Println("Подключение к БД успешно")
+		dbpool, err := pgxpool.New(context.Background(), dsn)
+
+		if err != nil {
+			log.Fatalf("Ошибка подключения к БД: %v", err)
+		}
+
+		instance = &Psql{db: dbpool}
+	})
+
+	return instance
 }

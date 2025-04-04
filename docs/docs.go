@@ -25,7 +25,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Task"
+                                "$ref": "#/definitions/model.Task"
                             }
                         }
                     },
@@ -47,7 +47,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
@@ -55,7 +55,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     },
                     "400": {
@@ -91,7 +91,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/model.Task"
                         }
                     }
                 ],
@@ -146,7 +146,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Task": {
+        "model.Task": {
             "type": "object",
             "required": [
                 "status",
