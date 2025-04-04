@@ -4,10 +4,9 @@ import (
 	"awesomeProject2/internal/database"
 	"awesomeProject2/internal/models"
 	"context"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 // CreateTask godoc
@@ -25,7 +24,6 @@ func CreateTask(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Неверные данные"})
 	}
 
-	// Валидация данных
 	if err := task.Validate(); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Ошибка валидации данных", "details": err.Error()})
 	}

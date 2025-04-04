@@ -15,23 +15,18 @@ import (
 // @BasePath        /api
 func main() {
 	database.ConnectDB()
-
 	app := fiber.New()
-
-	// Эндпоинт для документации Swagger
 	app.Get("/swagger/*", swagger.HandlerDefault)
 	app.Get("/swagger/doc.json", func(c *fiber.Ctx) error {
 		return c.SendFile("./docs/swagger.json")
 	})
-
-	// API маршруты
 	app.Post("/tasks", handlers.CreateTask)
 	app.Get("/tasks", handlers.GetTasks)
 	app.Put("/tasks/:id", handlers.UpdateTask)
 	app.Delete("/tasks/:id", handlers.DeleteTask)
-
-	fmt.Println("🚀 Сервер запущен на http://localhost:3000")
+	fmt.Println("Сервер запущен на http://localhost:3000")
 	err := app.Listen(":3000")
+
 	if err != nil {
 		panic(err)
 	}

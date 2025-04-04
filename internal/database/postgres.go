@@ -14,6 +14,7 @@ var DB *pgxpool.Pool
 
 func ConnectDB() {
 	err := godotenv.Load("config/.env")
+
 	if err != nil {
 		log.Fatal("Ошибка загрузки .env файла")
 	}
@@ -30,13 +31,8 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatalf("Ошибка подключения к БД: %v", err)
 	}
-
-	// Путь к папке с миграциями
 	migrationDir := "./migrations"
-
-	// Применяем миграции
 	migrations.MigrateDatabase(dbpool, migrationDir)
-
 	DB = dbpool
 	fmt.Println("Подключение к БД успешно")
 }

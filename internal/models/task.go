@@ -15,7 +15,6 @@ type Task struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-// Валидация структуры Task
 func (t *Task) Validate() error {
 	validate := validator.New()
 	return validate.Struct(t)
