@@ -25,7 +25,7 @@ definitions:
 info:
   contact: {}
   description: API для работы с задачами
-  title: TODO List API
+  title: API TaskList
   version: "1.0"
 paths:
   /tasks:

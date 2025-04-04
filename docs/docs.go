@@ -187,7 +187,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "TODO List API",
+	Title:            "API TaskList",
 	Description:      "API для работы с задачами",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

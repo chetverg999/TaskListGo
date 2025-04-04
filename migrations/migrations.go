@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2/log"
-	pgxpool2 "github.com/jackc/pgx/v5/pgxpool"
+	pgxpool "github.com/jackc/pgx/v5/pgxpool"
 	"io/ioutil"
 )
 
-func MigrateDatabase(conn *pgxpool2.Pool, migrationDir string) {
+func MigrateDatabase(conn *pgxpool.Pool, migrationDir string) {
 	files, err := ioutil.ReadDir(migrationDir)
 	if err != nil {
 		log.Fatalf("Ошибка при чтении директории миграций: %v\n", err)
@@ -33,7 +33,7 @@ func IsSQLFile(fileName string) bool {
 	return len(fileName) > 4 && fileName[len(fileName)-4:] == ".sql"
 }
 
-func ApplyMigration(conn *pgxpool2.Pool, filePath string) error {
+func ApplyMigration(conn *pgxpool.Pool, filePath string) error {
 	sqlBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("не удалось прочитать файл миграции %s: %v", filePath, err)

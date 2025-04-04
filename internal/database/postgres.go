@@ -1,13 +1,13 @@
 package database
 
 import (
-	"awesomeProject2/migrations"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"testTask/migrations"
 )
 
 var DB *pgxpool.Pool

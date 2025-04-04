@@ -1,15 +1,14 @@
 package main
 
 import (
-	_ "awesomeProject2/docs"
-	"awesomeProject2/internal/database"
-	"awesomeProject2/internal/handlers"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"testTask/internal/database"
+	"testTask/internal/handlers"
 )
 
-// @title           TODO List API
+// @title           API TaskList
 // @version         1.0
 // @description     API для работы с задачами
 // @BasePath        /api

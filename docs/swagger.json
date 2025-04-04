@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "API для работы с задачами",
-        "title": "TODO List API",
+        "title": "API TaskList",
         "contact": {},
         "version": "1.0"
     },

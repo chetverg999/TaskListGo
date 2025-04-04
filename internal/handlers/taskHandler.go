@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"awesomeProject2/internal/database"
-	"awesomeProject2/internal/models"
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
+	"testTask/internal/database"
+	"testTask/internal/models"
 	"time"
 )
 
